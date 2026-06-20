@@ -20,6 +20,7 @@ https://api.larvoice.com
 - [Danh sách job](#danh-sách-job)
 - [File output](#file-output)
 - [Tham số request](#tham-số-request)
+- [Upload voice mẫu](#upload-voice-mẫu)
 - [Rate limit và quota](#rate-limit-và-quota)
 - [Lỗi thường gặp](#lỗi-thường-gặp)
 - [Chính sách dữ liệu](#chính-sách-dữ-liệu)
@@ -40,6 +41,7 @@ API key chỉ xem được job do chính key đó tạo. Nếu mất key, hãy y
 GET  /health
 GET  /playground
 GET  /v1/me
+POST /v1/voices
 POST /v1/tts
 GET  /v1/tts/jobs
 GET  /v1/tts/jobs/:job_id
@@ -55,7 +57,7 @@ Trải nghiệm API trực tiếp tại:
 https://api.larvoice.com/playground
 ```
 
-Playground cho phép nhập API key, kiểm tra quota, tạo job TTS, poll trạng thái và nghe audio sau khi job hoàn thành.
+Playground cho phép nhập API key, upload voice mẫu, kiểm tra quota, tạo job TTS, poll trạng thái và nghe audio sau khi job hoàn thành.
 
 ## Quick Start
 
@@ -279,11 +281,43 @@ Lưu ý:
 | `post_volume` | Không | number | `0.1` | Tăng/giảm âm lượng, từ `-20` đến `20`. |
 | `language` | Không | string | `vi` | `vi` hoặc `en`. |
 | `gen_text` | Có | string | - | Nội dung cần tạo giọng nói. Tối đa `10000` ký tự mỗi job. |
-| `ref_audio_url` | Có | string | - | URL giọng mẫu được Larvoice cho phép. |
+| `ref_audio_url` | Có | string | - | URL giọng mẫu HTTPS bất kỳ hoặc URL trả về từ `POST /v1/voices`. Larvoice cache sang R2 và dùng tối đa `2.5` giây đầu làm reference. |
 | `return_srt` | Không | boolean | `false` | Trả thêm file SRT và segments. |
 | `output_format` | Không | string | `wav` | `wav` hoặc `mp3`. |
 
 Các field lạ sẽ bị reject. `output_audio=true` không được hỗ trợ trong queued API; hãy dùng `audio_url` sau khi job hoàn thành.
+
+## Upload Voice Mẫu
+
+Endpoint:
+
+```http
+POST /v1/voices
+```
+
+Upload file audio để Larvoice cache sang R2 và trả về `ref_audio_url` chuẩn dùng cho `POST /v1/tts`.
+
+Ví dụ:
+
+```bash
+curl --location 'https://api.larvoice.com/v1/voices' \
+  --header 'x-api-key: <your-api-key>' \
+  --form 'file=@voice-sample.mp3'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "ref_audio_url": "https://api.larvoice.com/ref-audio/<sha256>.mp3",
+    "file_name": "<sha256>.mp3",
+    "content_type": "audio/mpeg",
+    "size_bytes": 123456,
+    "max_reference_seconds": 2.5
+  }
+}
+```
 
 ## Rate Limit Và Quota
 
