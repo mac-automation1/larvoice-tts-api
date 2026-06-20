@@ -22,6 +22,8 @@ https://api.larvoice.com
 - [File output](#file-output)
 - [Tham số request](#tham-số-request)
 - [Upload voice mẫu](#upload-voice-mẫu)
+- [Danh sách voice mẫu](#danh-sách-voice-mẫu)
+- [Xóa voice mẫu](#xóa-voice-mẫu)
 - [Rate limit và quota](#rate-limit-và-quota)
 - [Lỗi thường gặp](#lỗi-thường-gặp)
 - [Chính sách dữ liệu](#chính-sách-dữ-liệu)
@@ -60,11 +62,16 @@ API key đầy đủ chỉ hiển thị khi tạo key. Hãy lưu key ở nơi an
 ```http
 GET  /health
 GET  /playground
+GET  /app
 GET  /v1/me
 POST /v1/voices
+GET  /v1/voices
+DELETE /v1/voices/:voice_id
 POST /v1/tts
 GET  /v1/tts/jobs
 GET  /v1/tts/jobs/:job_id
+GET  /ref-audio/:file
+HEAD /ref-audio/:file
 GET  /files/:file?expires=...&signature=...
 HEAD /files/:file?expires=...&signature=...
 ```
@@ -324,6 +331,11 @@ POST /v1/voices
 
 Upload file audio để Larvoice cache sang R2 và trả về `ref_audio_url` chuẩn dùng cho `POST /v1/tts`.
 
+Giới hạn voice đã lưu:
+
+- Free user: tối đa `1` voice.
+- Paid user: tối đa `50` voices.
+
 Ví dụ:
 
 ```bash
@@ -337,14 +349,86 @@ Response:
 ```json
 {
   "data": {
+    "voice_id": "<voice_id>",
     "ref_audio_url": "https://api.larvoice.com/ref-audio/<sha256>.mp3",
     "file_name": "<sha256>.mp3",
     "content_type": "audio/mpeg",
     "size_bytes": 123456,
-    "max_reference_seconds": 2.5
+    "max_reference_seconds": 2.5,
+    "voice_count": 1,
+    "max_voices": 1
   }
 }
 ```
+
+Nếu vượt giới hạn, API trả `403 voice_limit_exceeded`. Upload lại cùng một file voice đã lưu không tốn thêm slot.
+
+## Danh Sách Voice Mẫu
+
+Endpoint:
+
+```http
+GET /v1/voices
+```
+
+Ví dụ:
+
+```bash
+curl --location 'https://api.larvoice.com/v1/voices' \
+  --header 'x-api-key: <your-api-key>'
+```
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "id": "<voice_id>",
+      "ref_audio_id": "<ref_audio_id>",
+      "ref_audio_url": "https://api.larvoice.com/ref-audio/<sha256>.mp3",
+      "file_name": "<sha256>.mp3",
+      "content_type": "audio/mpeg",
+      "size_bytes": 123456,
+      "created_at": "2026-06-20T12:00:00.000Z",
+      "last_used_at": "2026-06-20T12:00:00.000Z",
+      "use_count": 1
+    }
+  ],
+  "meta": {
+    "voice_count": 1,
+    "max_voices": 1
+  }
+}
+```
+
+## Xóa Voice Mẫu
+
+Endpoint:
+
+```http
+DELETE /v1/voices/:voice_id
+```
+
+Ví dụ:
+
+```bash
+curl --request DELETE 'https://api.larvoice.com/v1/voices/<voice_id>' \
+  --header 'x-api-key: <your-api-key>'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "<voice_id>",
+    "deleted": true
+  }
+}
+```
+
+Xóa voice sẽ gỡ voice khỏi API key của bạn và giải phóng slot upload. File cache nội bộ có thể vẫn được giữ lại để tránh ảnh hưởng voice dùng chung hoặc request cũ.
 
 ## Rate Limit Và Quota
 
