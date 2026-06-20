@@ -11,6 +11,7 @@ https://api.larvoice.com
 ## Mục Lục
 
 - [Xác thực](#xác-thực)
+- [Nhận API key miễn phí](#nhận-api-key-miễn-phí)
 - [Endpoint](#endpoint)
 - [Playground](#playground)
 - [Quick start](#quick-start)
@@ -33,7 +34,26 @@ Gửi API key trong header `x-api-key`:
 x-api-key: <your-api-key>
 ```
 
-API key chỉ xem được job do chính key đó tạo. Nếu mất key, hãy yêu cầu cấp key mới.
+API key chỉ xem được job do chính key đó tạo. Nếu mất key, hãy tạo key mới trong Larvoice Mini App.
+
+## Nhận API key miễn phí
+
+Người dùng có thể nhận API key miễn phí qua Telegram bot Larvoice:
+
+```text
+https://t.me/larvoice_api_bot
+```
+
+Cách lấy key:
+
+1. Mở Telegram.
+2. Tìm bot `@larvoice_api_bot` hoặc mở link trên.
+3. Bấm `Start`.
+4. Mở Larvoice Mini App từ bot.
+5. Đăng nhập bằng Telegram trong Mini App.
+6. Sao chép API key được tạo cho tài khoản của bạn.
+
+API key đầy đủ chỉ hiển thị khi tạo key. Hãy lưu key ở nơi an toàn. Nếu mất key hoặc nghi ngờ key bị lộ, hãy tạo key mới trong Mini App; key cũ sẽ bị vô hiệu hóa.
 
 ## Endpoint
 
