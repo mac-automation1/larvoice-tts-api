@@ -57,7 +57,14 @@ Trải nghiệm API trực tiếp tại:
 https://api.larvoice.com/playground
 ```
 
-Playground cho phép nhập API key, upload voice mẫu, kiểm tra quota, tạo job TTS, poll trạng thái và nghe audio sau khi job hoàn thành.
+Playground cho phép nhập API key, upload voice mẫu, chọn nhanh giọng demo/text demo, kiểm tra quota, tạo job TTS, poll trạng thái và nghe audio sau khi job hoàn thành.
+
+Giọng demo có sẵn:
+
+- Ngọc Huyền: `https://media.publit.io/file/larvoice/voice-custom/Ngoc-Huyen-v1.mp3`
+- Anh Quân: `https://media.publit.io/file/larvoice/voice-custom/AnhQuan.mp3`
+- Adam: `https://media.publit.io/file/larvoice/voice-custom/Adam.mp3`
+- Vy Anh: `https://media.publit.io/file/larvoice/voice-custom/VyAnh.mp3`
 
 ## Quick Start
 
