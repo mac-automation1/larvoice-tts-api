@@ -109,6 +109,8 @@ Response:
 
 ### 2. Tạo job TTS
 
+Bạn có thể dùng `ref_audio_url` trực tiếp, hoặc dùng `voice_id` của voice đã upload. Nếu gửi cả hai, `ref_audio_url` được ưu tiên.
+
 ```bash
 curl --location 'https://api.larvoice.com/v1/tts' \
   --header 'Content-Type: application/json' \
@@ -133,6 +135,21 @@ Response `202 Accepted`:
     "status_url": "https://api.larvoice.com/v1/tts/jobs/9f6c2131-0f7c-41e4-90f2-ae3c7f336d00"
   }
 }
+```
+
+Tái dùng voice đã upload:
+
+```bash
+curl --location 'https://api.larvoice.com/v1/tts' \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: <your-api-key>' \
+  --data '{
+    "voice_id": "<voice_id>",
+    "language": "vi",
+    "gen_text": "Xin chào, đây là Larvoice TTS API.",
+    "return_srt": true,
+    "output_format": "wav"
+  }'
 ```
 
 ### 3. Poll job
@@ -228,6 +245,16 @@ Body tối thiểu:
 }
 ```
 
+Body tối thiểu với voice đã upload:
+
+```json
+{
+  "voice_id": "<voice_id>",
+  "language": "vi",
+  "gen_text": "Nội dung cần tạo giọng nói."
+}
+```
+
 Body có SRT:
 
 ```json
@@ -315,7 +342,8 @@ Lưu ý:
 | `post_volume` | Không | number | `0.1` | Tăng/giảm âm lượng, từ `-20` đến `20`. |
 | `language` | Không | string | `vi` | `vi` hoặc `en`. |
 | `gen_text` | Có | string | - | Nội dung cần tạo giọng nói. Tối đa `10000` ký tự mỗi job. |
-| `ref_audio_url` | Có | string | - | URL giọng mẫu HTTPS bất kỳ hoặc URL trả về từ `POST /v1/voices`. Larvoice cache sang R2 và dùng tối đa `2.5` giây đầu làm reference. |
+| `ref_audio_url` | Có nếu không có `voice_id` | string | - | URL giọng mẫu HTTPS bất kỳ hoặc URL trả về từ `POST /v1/voices`. Larvoice cache sang R2 và dùng tối đa `2.5` giây đầu làm reference. Nếu gửi cùng `voice_id`, trường này được ưu tiên. |
+| `voice_id` | Có nếu không có `ref_audio_url` | string | - | ID voice đã upload qua `POST /v1/voices`. Dùng để tái sử dụng voice mà không cần gửi lại URL. |
 | `return_srt` | Không | boolean | `false` | Trả thêm file SRT và segments. |
 | `output_format` | Không | string | `wav` | `wav` hoặc `mp3`. |
 
