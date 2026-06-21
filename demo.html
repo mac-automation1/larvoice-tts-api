@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Larvoice TTS API Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-main);
+            font-size: 15px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px var(--primary);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #result h3 {
+            margin-top: 0;
+            color: #10b981;
+            font-size: 16px;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 15px;
+            height: 40px;
+            outline: none;
+        }
+
+        #status-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .quota-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quota-btn {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: auto;
+            margin-top: 0;
+        }
+
+        .quota-btn:hover {
+            background: rgba(99, 102, 241, 0.3);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .quota-info {
+            font-size: 13px;
+            color: #34d399;
+        }
+
+        .history-container {
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .history-item {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .history-text {
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Larvoice TTS Studio</h1>
+        <p class="subtitle">Chuyển đổi văn bản thành giọng nói AI chất lượng cao với tính năng Voice Cloning.</p>
+
+        <div class="form-group">
+            <label for="apiKey">API Key</label>
+            <input type="password" id="apiKey" placeholder="Nhập Larvoice API Key của bạn">
+            <div class="quota-box">
+                <button type="button" id="checkQuotaBtn" class="quota-btn">Kiểm tra số dư</button>
+                <span id="quotaInfo" class="quota-info"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="refAudio">Reference Audio URL (Hoặc để trống nếu tải file lên)</label>
+            <input type="text" id="refAudio" value="https://media.publit.io/file/larvoice/voice-custom/Ngoc-Huyen-v1.mp3">
+        </div>
+
+        <div class="form-group">
+            <label for="audioFile">Hoặc Tải File Âm Thanh Từ Máy Lên (.mp3, .wav...)</label>
+            <input type="file" id="audioFile" accept="audio/*" style="padding: 10px; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-color); border-radius: 12px; width: 100%; color: var(--text-main); box-sizing: border-box;">
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 6px; margin-bottom: 0;">Tải file lên sẽ tự động tạo Voice mới và copy giọng từ file này.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="text">Nội dung văn bản</label>
+            <textarea id="text">Xin chào, đây là bản demo ứng dụng tích hợp Larvoice TTS API. Mình đang test thử tính năng chuyển đổi văn bản thành giọng nói tiếng Việt.</textarea>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-top: 6px;">
+                <span id="charCount">Độ dài: 0 ký tự</span>
+                <span id="estimatedCost" style="color: #cbd5e1; font-weight: 500;">Dự kiến tốn: 0 credits</span>
+            </div>
+        </div>
+
+        <button id="generateBtn">
+            <span class="spinner" id="spinner"></span>
+            <span id="btnText">Tạo Giọng Nói</span>
+        </button>
+
+        <div id="status-text"></div>
+
+        <div id="result">
+            <h3>🎉 Hoàn tất! Nghe thử ngay:</h3>
+            <p id="billedInfo" style="font-size: 13px; color: #34d399; margin-top: 5px; margin-bottom: 5px;"></p>
+            <audio id="audioPlayer" controls></audio>
+        </div>
+
+        <div class="history-container">
+            <h3 style="font-size: 18px; margin-bottom: 15px; margin-top: 0;">Lịch sử tạo</h3>
+            <div id="historyList">
+                <p style="font-size: 13px; color: var(--text-muted); text-align: center;">Chưa có lịch sử nào.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_TTS_URL = 'https://api.larvoice.com/v1/tts';
+        const API_VOICES_URL = 'https://api.larvoice.com/v1/voices';
+        const API_ME_URL = 'https://api.larvoice.com/v1/me';
+        
+        const btn = document.getElementById('generateBtn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+        const statusText = document.getElementById('status-text');
+        const resultDiv = document.getElementById('result');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const textEl = document.getElementById('text');
+        const charCountEl = document.getElementById('charCount');
+        const estimatedCostEl = document.getElementById('estimatedCost');
+        const historyList = document.getElementById('historyList');
+        const checkQuotaBtn = document.getElementById('checkQuotaBtn');
+        const quotaInfo = document.getElementById('quotaInfo');
+
+        checkQuotaBtn.addEventListener('click', async () => {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) return alert("Vui lòng nhập API Key để kiểm tra!");
+            
+            checkQuotaBtn.innerText = 'Đang ktra...';
+            try {
+                const res = await fetch(API_ME_URL, { headers: { 'x-api-key': apiKey } });
+                if (!res.ok) throw new Error('API Key không hợp lệ');
+                const data = await res.json();
+                quotaInfo.style.color = '#34d399';
+                quotaInfo.innerText = `✅ Còn lại: ${data.data.remaining_characters.toLocaleString('vi-VN')} credits`;
+            } catch (err) {
+                quotaInfo.style.color = '#ef4444';
+                quotaInfo.innerText = '❌ Lỗi hoặc sai API Key';
+            } finally {
+                checkQuotaBtn.innerText = 'Kiểm tra số dư';
+            }
+        });
+
+        function updateCharCount() {
+            const count = textEl.value.trim().length;
+            charCountEl.innerText = `Độ dài: ${count} ký tự`;
+            estimatedCostEl.innerText = `Dự kiến tốn: ${count} credits`;
+        }
+
+        textEl.addEventListener('input', updateCharCount);
+        updateCharCount();
+
+        async function pollStatus(statusUrl, apiKey) {
+            statusText.innerText = "Đang xử lý âm thanh... (Vui lòng chờ)";
+            
+            while (true) {
+                try {
+                    const response = await fetch(statusUrl, {
+                        headers: { 'x-api-key': apiKey }
+                    });
+                    
+                    const res = await response.json();
+                    
+                    if (res.data.status === 'completed') {
+                        return res.data;
+                    } else if (res.data.status === 'failed') {
+                        throw new Error(res.data.error?.message || 'Có lỗi xảy ra khi tạo audio');
+                    }
+                    
+                    // Chờ 2 giây trước khi poll lại
+                    await new Promise(r => setTimeout(r, 2000));
+                } catch (err) {
+                    throw err;
+                }
+            }
+        }
+
+        btn.addEventListener('click', async () => {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const refAudio = document.getElementById('refAudio').value.trim();
+            const audioFile = document.getElementById('audioFile').files[0];
+            const text = document.getElementById('text').value.trim();
+
+            if (!apiKey) return alert("Vui lòng nhập API Key!");
+            if (!text) return alert("Vui lòng nhập văn bản!");
+            if (!refAudio && !audioFile) return alert("Vui lòng nhập URL hoặc tải file âm thanh lên!");
+
+            // Cập nhật UI
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            btnText.innerText = 'Đang khởi tạo Job...';
+            statusText.innerText = '';
+            resultDiv.style.display = 'none';
+
+            try {
+                let requestBody = {
+                    gen_text: text,
+                    language: 'vi',
+                    return_srt: true,
+                    output_format: 'wav'
+                };
+
+                if (audioFile) {
+                    // Upload file first
+                    btnText.innerText = 'Đang tải file âm thanh lên...';
+                    const formData = new FormData();
+                    formData.append('name', 'Demo Voice ' + new Date().getTime());
+                    formData.append('file', audioFile);
+
+                    const uploadRes = await fetch(API_VOICES_URL, {
+                        method: 'POST',
+                        headers: {
+                            'x-api-key': apiKey
+                        },
+                        body: formData
+                    });
+
+                    if (!uploadRes.ok) {
+                        const err = await uploadRes.json();
+                        throw new Error(err.message || 'Lỗi khi upload file âm thanh');
+                    }
+                    
+                    const uploadData = await uploadRes.json();
+                    requestBody.voice_id = uploadData.data.voice_id;
+                } else {
+                    requestBody.ref_audio_url = refAudio;
+                }
+
+                // 1. Tạo Job
+                btnText.innerText = 'Đang khởi tạo Job...';
+                const response = await fetch(API_TTS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errRes = await response.json();
+                    throw new Error(errRes.message || 'Lỗi kết nối tới API');
+                }
+
+                const data = await response.json();
+                const statusUrl = data.data.status_url;
+
+                // 2. Poll trạng thái Job
+                const completedData = await pollStatus(statusUrl, apiKey);
+
+                // 3. Hiển thị kết quả
+                statusText.innerText = '';
+                audioPlayer.src = completedData.audio_url;
+                document.getElementById('billedInfo').innerText = `✅ Đã trừ: ${completedData.character_count} credits vào tài khoản.`;
+                resultDiv.style.display = 'block';
+
+                // 4. Lưu lịch sử
+                if (historyList.querySelector('p')) {
+                    historyList.innerHTML = ''; // Xóa chữ "Chưa có lịch sử"
+                }
+                const now = new Date();
+                const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} ${now.getDate()}/${now.getMonth()+1}`;
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-meta">
+                        <span>🕒 ${timeStr}</span>
+                        <span style="color: #f43f5e; font-weight: 600;">-${completedData.character_count} credits</span>
+                    </div>
+                    <div class="history-text">"${text}"</div>
+                    <audio controls src="${completedData.audio_url}"></audio>
+                `;
+                historyList.prepend(historyItem);
+
+                // Auto update quota if it was checked before
+                if (quotaInfo.innerText.includes('Còn lại')) {
+                    checkQuotaBtn.click();
+                }
+
+            } catch (error) {
+                alert("Lỗi: " + error.message);
+                statusText.innerText = "Thất bại: " + error.message;
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.innerText = 'Tạo Giọng Nói';
+            }
+        });
+    </script>
+</body>
+</html>
