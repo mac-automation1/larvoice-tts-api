@@ -10,6 +10,11 @@ Primary documentation:
 - Playground: https://api.larvoice.com/playground
 - Mini App: https://api.larvoice.com/app
 
+MCP package:
+- Command: npx -y @larvoice/mcp
+- Auth env: LARVOICE_API_KEY=<your-api-key>
+- Works with Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes, and other command-based MCP clients.
+
 Authentication:
 - Send user API key with header: x-api-key: <your-api-key>
 - Get a free API key from Telegram bot: https://t.me/larvoice_api_bot

@@ -825,7 +825,7 @@ https://api.larvoice.com/llms-full.md
 
 `llms.txt` là bản index ngắn cho agent discovery. `llms-full.md` là hướng dẫn tích hợp đầy đủ, gồm flow khuyến nghị, endpoint, request mẫu, response mẫu, limits và error shape.
 
-Larvoice MCP package đã publish trên npm. User có thể tích hợp Larvoice vào Cursor, Codex hoặc MCP client khác bằng `npx`, không cần cài đặt thủ công.
+Larvoice MCP package đã publish trên npm. User có thể tích hợp Larvoice vào Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes hoặc MCP client khác bằng `npx`, không cần cài đặt thủ công.
 
 Package:
 
@@ -842,6 +842,18 @@ LARVOICE_API_KEY=lv_your_key
 ```
 
 Khi chạy trong Cursor, Codex hoặc MCP client khác, client sẽ tự truyền API key này cho Larvoice MCP package.
+
+Client hỗ trợ:
+
+| Client | Cách cấu hình |
+| --- | --- |
+| Cursor | Dùng JSON `mcpServers`. |
+| Codex | Dùng TOML `mcp_servers`. |
+| Claude Desktop | Dùng JSON `mcpServers`. |
+| Kiro | Dùng MCP server command nếu client hỗ trợ MCP. |
+| Antigravity | Dùng MCP server command nếu client hỗ trợ MCP. |
+| OpenClaw | Dùng MCP server command nếu client hỗ trợ MCP. |
+| Hermes | Dùng MCP server command nếu client hỗ trợ MCP. |
 
 ### Cursor
 
@@ -876,7 +888,26 @@ LARVOICE_API_KEY = "lv_your_key"
 LARVOICE_BASE_URL = "https://api.larvoice.com"
 ```
 
-### MCP client khác
+### Claude Desktop
+
+Thêm vào MCP config của Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "larvoice": {
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
+      "env": {
+        "LARVOICE_API_KEY": "lv_your_key",
+        "LARVOICE_BASE_URL": "https://api.larvoice.com"
+      }
+    }
+  }
+}
+```
+
+### Kiro, Antigravity, OpenClaw, Hermes và MCP client khác
 
 Nếu client hỗ trợ MCP qua command, dùng:
 

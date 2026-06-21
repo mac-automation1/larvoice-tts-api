@@ -455,7 +455,7 @@ Common error codes:
 
 ## MCP Integration Guide
 
-Larvoice provides a published MCP package for user integrations. Run it with `npx -y @larvoice/mcp`, pass the user's API key as an environment variable, then call Larvoice through MCP tools.
+Larvoice provides a published MCP package for user integrations. It works with Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes, and other MCP clients that can run command-based MCP servers. Run it with `npx -y @larvoice/mcp`, pass the user's API key as an environment variable, then call Larvoice through MCP tools.
 
 Authentication for MCP is environment-based. Put the user's API key in `LARVOICE_API_KEY` in the MCP client config. There is no separate login prompt.
 
@@ -506,6 +506,25 @@ args = ["-y", "@larvoice/mcp"]
 LARVOICE_API_KEY = "lv_your_key"
 LARVOICE_BASE_URL = "https://api.larvoice.com"
 ```
+
+Claude Desktop config shape:
+
+```json
+{
+  "mcpServers": {
+    "larvoice": {
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
+      "env": {
+        "LARVOICE_API_KEY": "lv_your_key",
+        "LARVOICE_BASE_URL": "https://api.larvoice.com"
+      }
+    }
+  }
+}
+```
+
+For Kiro, Antigravity, OpenClaw, Hermes, or other MCP clients, use the same command server values: `command = npx`, `args = -y @larvoice/mcp`, and `LARVOICE_API_KEY` in environment config.
 
 Local run command:
 
