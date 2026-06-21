@@ -42,9 +42,13 @@ https://api.larvoice.com
 - [Endpoint](#endpoint)
 - [Quick start](#quick-start)
 - [Tạo job TTS](#tạo-job-tts)
+- [Nghe thử TTS](#nghe-thử-tts)
+- [Tạo nhiều job TTS](#tạo-nhiều-job-tts)
 - [Kiểm tra trạng thái job](#kiểm-tra-trạng-thái-job)
 - [Danh sách job](#danh-sách-job)
 - [Thông tin tài khoản](#thông-tin-tài-khoản)
+- [Thống kê usage](#thống-kê-usage)
+- [Danh sách ngôn ngữ](#danh-sách-ngôn-ngữ)
 - [Upload voice mẫu](#upload-voice-mẫu)
 - [Quản lý voice](#quản-lý-voice)
 - [Tham số request](#tham-số-request)
@@ -90,11 +94,18 @@ GET    /health
 GET    /playground
 GET    /app
 GET    /v1/me
+GET    /v1/usage
+GET    /v1/languages
 POST   /v1/tts
+POST   /v1/tts/preview
+POST   /v1/tts/batch
 GET    /v1/tts/jobs
 GET    /v1/tts/jobs/:job_id
+POST   /v1/tts/jobs/:job_id/cancel
 POST   /v1/voices
 GET    /v1/voices
+GET    /v1/voices/:id
+POST   /v1/voices/:id/preview
 PATCH  /v1/voices/:id
 PUT    /v1/voices/:id
 DELETE /v1/voices/:id
@@ -234,6 +245,88 @@ Dùng `voice_id` (voice đã upload qua `POST /v1/voices`):
 
 Nếu gửi cả hai, `ref_audio_url` được ưu tiên.
 
+## Nghe thử TTS
+
+```http
+POST /v1/tts/preview
+```
+
+Dùng để nghe thử nhanh một đoạn ngắn trước khi tạo job dài. Preview tối đa `500` ký tự và trả `audio_url` trực tiếp.
+
+```bash
+curl -X POST 'https://api.larvoice.com/v1/tts/preview' \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: <your-api-key>' \
+  -d '{
+    "voice_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "text": "Xin chào, đây là bản nghe thử.",
+    "language": "vi",
+    "output_format": "wav"
+  }'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "audio_url": "https://api.larvoice.com/files/tts_20260620_120010_123456.wav?expires=1782043210&signature=...",
+    "content_type": "audio/wav",
+    "duration_seconds": 2.18,
+    "expires_at": "2026-06-21T12:00:10.000000",
+    "return_srt": false,
+    "character_count": 34
+  }
+}
+```
+
+## Tạo nhiều job TTS
+
+```http
+POST /v1/tts/batch
+```
+
+Dùng khi cần tạo nhiều đoạn audio cùng voice, ví dụ video nhiều cảnh, khóa học, IVR hoặc nội dung theo chương. Các cấu hình chung như `voice_id`, `language`, `output_format`, `return_srt` có thể đặt ở cấp ngoài; mỗi item chỉ cần `id` và `gen_text`.
+
+```bash
+curl -X POST 'https://api.larvoice.com/v1/tts/batch' \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: <your-api-key>' \
+  -d '{
+    "voice_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "language": "vi",
+    "return_srt": true,
+    "output_format": "wav",
+    "items": [
+      { "id": "intro", "gen_text": "Xin chào, đây là phần mở đầu." },
+      { "id": "chapter_1", "gen_text": "Bây giờ chúng ta bắt đầu chương một." },
+      { "id": "outro", "gen_text": "Cảm ơn bạn đã lắng nghe." }
+    ]
+  }'
+```
+
+Response `202 Accepted`:
+
+```json
+{
+  "data": {
+    "batch_size": 3,
+    "total_character_count": 96,
+    "jobs": [
+      {
+        "id": "intro",
+        "job_id": "11111111-1111-1111-1111-111111111111",
+        "status": "queued",
+        "character_count": 34,
+        "status_url": "https://api.larvoice.com/v1/tts/jobs/11111111-1111-1111-1111-111111111111"
+      }
+    ]
+  }
+}
+```
+
+Mỗi item tạo một job riêng và poll bằng `status_url` như job TTS bình thường. Tối đa `50` item mỗi batch. Quota trừ theo tổng ký tự của toàn bộ item.
+
 ## Kiểm tra trạng thái job
 
 ```http
@@ -251,6 +344,36 @@ curl 'https://api.larvoice.com/v1/tts/jobs/<job_id>' \
 | `processing` | Job đang được tạo audio. |
 | `completed` | Job hoàn thành, response có `audio_url`. |
 | `failed` | Job thất bại, response có `error.code` và `error.message`. |
+
+### Hủy job
+
+```http
+POST /v1/tts/jobs/:job_id/cancel
+```
+
+Hủy job đang `queued`. Job đã `processing` hoặc đã hoàn thành không thể hủy.
+
+```bash
+curl -X POST 'https://api.larvoice.com/v1/tts/jobs/<job_id>/cancel' \
+  -H 'x-api-key: <your-api-key>'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "job_id": "9f6c2131-0f7c-41e4-90f2-ae3c7f336d00",
+    "status": "failed",
+    "character_count": 34,
+    "error": {
+      "code": "cancelled",
+      "message": "Job cancelled by user"
+    },
+    "cancelled": true
+  }
+}
+```
 
 ## Danh sách job
 
@@ -306,6 +429,103 @@ Response:
 ```
 
 `expires_at: null` nghĩa là API key không có ngày hết hạn cố định.
+
+## Thống kê usage
+
+```http
+GET /v1/usage
+```
+
+Xem quota, số job, ký tự đã gửi và thống kê theo ngày. Mặc định trả 30 ngày gần nhất. Có thể lọc bằng `from` và `to` theo định dạng `YYYY-MM-DD`.
+
+```bash
+curl 'https://api.larvoice.com/v1/usage?from=2026-06-01&to=2026-06-21' \
+  -H 'x-api-key: <your-api-key>'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "range": {
+      "from": "2026-06-01",
+      "to": "2026-06-21",
+      "days": 21
+    },
+    "quota": {
+      "character_limit": 1000000,
+      "characters_used": 12000,
+      "remaining_characters": 988000
+    },
+    "voices": {
+      "voice_count": 3,
+      "max_voices": 50
+    },
+    "summary": {
+      "total_jobs": 12,
+      "queued_jobs": 1,
+      "processing_jobs": 0,
+      "completed_jobs": 10,
+      "failed_jobs": 1,
+      "submitted_characters": 14300,
+      "completed_requests": 10,
+      "completed_characters": 12000
+    },
+    "daily": [
+      {
+        "date": "2026-06-21",
+        "jobs": 4,
+        "submitted_characters": 3200,
+        "completed_requests": 3,
+        "completed_characters": 2400
+      }
+    ]
+  }
+}
+```
+
+Range tối đa `370` ngày.
+
+## Danh sách ngôn ngữ
+
+```http
+GET /v1/languages
+```
+
+Endpoint public để frontend lấy danh sách ngôn ngữ hỗ trợ.
+
+```bash
+curl 'https://api.larvoice.com/v1/languages'
+```
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "code": "vi",
+      "name": "Vietnamese",
+      "native_name": "Tiếng Việt",
+      "default": true,
+      "supports_srt": true,
+      "supports_voice_clone": true
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "native_name": "English",
+      "default": false,
+      "supports_srt": true,
+      "supports_voice_clone": true
+    }
+  ],
+  "meta": {
+    "default_language": "vi"
+  }
+}
+```
 
 ## Upload voice mẫu
 
@@ -395,6 +615,59 @@ Response:
   }
 }
 ```
+
+### Chi tiết voice
+
+```http
+GET /v1/voices/:id
+```
+
+```bash
+curl 'https://api.larvoice.com/v1/voices/<voice_id>' \
+  -H 'x-api-key: <your-api-key>'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "ref_audio_id": "...",
+    "name": "Giọng nữ bán hàng",
+    "ref_text": "Xin chào, đây là đoạn giọng mẫu của tôi.",
+    "ref_audio_url": "https://api.larvoice.com/ref-audio/<sha256>.mp3",
+    "file_name": "<sha256>.mp3",
+    "content_type": "audio/mpeg",
+    "size_bytes": 123456,
+    "created_at": "2026-06-20T12:00:00.000Z",
+    "updated_at": "2026-06-20T12:05:00.000Z",
+    "last_used_at": "2026-06-20T12:10:00.000Z",
+    "use_count": 5
+  }
+}
+```
+
+### Nghe thử voice
+
+```http
+POST /v1/voices/:id/preview
+```
+
+Nghe thử voice đã upload với một đoạn text ngắn. Có thể dùng `text` hoặc `gen_text`.
+
+```bash
+curl -X POST 'https://api.larvoice.com/v1/voices/<voice_id>/preview' \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: <your-api-key>' \
+  -d '{
+    "text": "Đây là bản nghe thử của voice này.",
+    "language": "vi",
+    "output_format": "wav"
+  }'
+```
+
+Response giống `POST /v1/tts/preview`.
 
 ### Sửa tên voice và ref text
 
