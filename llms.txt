@@ -8,6 +8,8 @@ Primary documentation:
 - Human docs: https://api.larvoice.com/README.md
 - LLM integration guide: https://api.larvoice.com/llms-full.md
 - MCP guide: https://api.larvoice.com/MCP.md
+- OpenAPI: https://api.larvoice.com/openapi.json
+- Postman guide: https://api.larvoice.com/POSTMAN.md
 - Playground: https://api.larvoice.com/playground
 - Mini App: https://api.larvoice.com/app
 

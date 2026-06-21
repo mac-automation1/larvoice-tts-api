@@ -10,6 +10,13 @@ Base URL:
 https://api.larvoice.com
 ```
 
+OpenAPI and Postman:
+
+```text
+https://api.larvoice.com/openapi.json
+https://api.larvoice.com/POSTMAN.md
+```
+
 ## Authentication
 
 Use a user API key in every authenticated request:

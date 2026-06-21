@@ -94,6 +94,8 @@ API key đầy đủ chỉ hiển thị khi tạo key. Hãy lưu key ở nơi an
 GET    /health
 GET    /playground
 GET    /app
+GET    /openapi.json
+GET    /POSTMAN.md
 GET    /v1/me
 GET    /v1/usage
 GET    /v1/languages
@@ -117,6 +119,18 @@ HEAD   /files/:file?expires=...&signature=...
 ```
 
 ## Quick start
+
+Import vào Postman:
+
+```text
+https://api.larvoice.com/openapi.json
+```
+
+Hướng dẫn Postman:
+
+```text
+https://api.larvoice.com/POSTMAN.md
+```
 
 ### 1. Kiểm tra service
 
