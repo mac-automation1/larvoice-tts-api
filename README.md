@@ -1,8 +1,8 @@
 # Larvoice TTS API
 
-Text-to-Speech API tiếng Việt dành cho production.
+Text-to-Speech API tiếng Việt miễn phí và trả phí dành cho production.
 
-Tạo giọng nói AI chất lượng cao từ văn bản thông qua HTTP API đơn giản. Hỗ trợ voice cloning, xử lý bất đồng bộ và khả năng mở rộng cho ứng dụng, sản phẩm SaaS, AI Agent và hệ thống tự động hóa.
+Tạo giọng nói AI chất lượng cao từ văn bản thông qua HTTP API/MCP đơn giản. Hỗ trợ voice cloning, xử lý bất đồng bộ và khả năng mở rộng cho ứng dụng, sản phẩm SaaS, AI Agent và hệ thống tự động hóa.
 
 Khác với LarVoice.com dành cho người dùng cuối, LarVoice API được xây dựng dành riêng cho lập trình viên và tích hợp hệ thống.
 
