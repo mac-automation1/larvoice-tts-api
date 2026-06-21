@@ -56,6 +56,7 @@ https://api.larvoice.com
 - [Rate limit và quota](#rate-limit-và-quota)
 - [Lỗi thường gặp](#lỗi-thường-gặp)
 - [Chính sách dữ liệu](#chính-sách-dữ-liệu)
+- [LLM và MCP](#llm-và-mcp)
 - [Playground](#playground)
 
 ## Xác thực
@@ -812,6 +813,45 @@ Error response chuẩn:
 - API key chỉ hiển thị một lần khi được cấp; hệ thống chỉ lưu hash.
 - Dữ liệu khách hàng không được bán, chia sẻ cho bên thứ ba, hoặc dùng để huấn luyện model.
 - Khi cần xóa dữ liệu sớm, liên hệ Larvoice kèm `job_id` hoặc API key liên quan.
+
+## LLM và MCP
+
+Larvoice có tài liệu riêng cho AI agent, coding assistant và workflow automation:
+
+```text
+https://api.larvoice.com/llms.txt
+https://api.larvoice.com/llms-full.md
+```
+
+`llms.txt` là bản index ngắn cho agent discovery. `llms-full.md` là hướng dẫn tích hợp đầy đủ, gồm flow khuyến nghị, endpoint, request mẫu, response mẫu, limits và error shape.
+
+Nếu xây MCP server hoặc custom tool wrapper cho AI agent, nên map các tool user-facing sau:
+
+| MCP tool gợi ý | Endpoint |
+| --- | --- |
+| `larvoice_get_account` | `GET /v1/me` |
+| `larvoice_get_usage` | `GET /v1/usage` |
+| `larvoice_list_languages` | `GET /v1/languages` |
+| `larvoice_upload_voice` | `POST /v1/voices` |
+| `larvoice_list_voices` | `GET /v1/voices` |
+| `larvoice_get_voice` | `GET /v1/voices/:id` |
+| `larvoice_update_voice` | `PATCH /v1/voices/:id` |
+| `larvoice_preview_tts` | `POST /v1/tts/preview` |
+| `larvoice_preview_voice` | `POST /v1/voices/:id/preview` |
+| `larvoice_create_tts_job` | `POST /v1/tts` |
+| `larvoice_create_tts_batch` | `POST /v1/tts/batch` |
+| `larvoice_get_job` | `GET /v1/tts/jobs/:job_id` |
+| `larvoice_list_jobs` | `GET /v1/tts/jobs` |
+| `larvoice_cancel_job` | `POST /v1/tts/jobs/:job_id/cancel` |
+
+Nguyên tắc cho AI agent:
+
+- Dùng `voice_id` sau khi upload voice.
+- Dùng preview trước khi tạo job dài.
+- Dùng batch khi cần nhiều đoạn audio.
+- Poll job đến khi `completed` hoặc `failed`.
+- Không log API key đầy đủ.
+- Không gửi field lạ ngoài docs.
 
 ## Playground
 

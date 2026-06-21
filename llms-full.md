@@ -452,3 +452,138 @@ Common error codes:
 - Poll jobs until `completed` or `failed`.
 - Never expose or log full API keys.
 - Do not send unknown request fields.
+
+## MCP Integration Guide
+
+Larvoice can be wrapped as MCP tools for AI agents. Use the user's API key as an environment variable in the MCP server, then call Larvoice with `x-api-key`.
+
+Recommended MCP tools:
+
+| Tool | Purpose | Endpoint |
+| --- | --- | --- |
+| `larvoice_get_account` | Read quota and account status. | `GET /v1/me` |
+| `larvoice_get_usage` | Read usage for dashboards or summaries. | `GET /v1/usage` |
+| `larvoice_list_languages` | Read supported languages. | `GET /v1/languages` |
+| `larvoice_upload_voice` | Upload a voice file and create `voice_id`. | `POST /v1/voices` |
+| `larvoice_list_voices` | List saved voices. | `GET /v1/voices` |
+| `larvoice_get_voice` | Read one voice. | `GET /v1/voices/:id` |
+| `larvoice_update_voice` | Edit voice name or ref text. | `PATCH /v1/voices/:id` |
+| `larvoice_preview_tts` | Create a short preview audio. | `POST /v1/tts/preview` |
+| `larvoice_preview_voice` | Preview a saved voice. | `POST /v1/voices/:id/preview` |
+| `larvoice_create_tts_job` | Create one async TTS job. | `POST /v1/tts` |
+| `larvoice_create_tts_batch` | Create many async TTS jobs. | `POST /v1/tts/batch` |
+| `larvoice_get_job` | Poll one job. | `GET /v1/tts/jobs/:job_id` |
+| `larvoice_list_jobs` | List jobs. | `GET /v1/tts/jobs` |
+| `larvoice_cancel_job` | Cancel a queued job. | `POST /v1/tts/jobs/:job_id/cancel` |
+
+Suggested MCP config shape for a custom wrapper:
+
+```json
+{
+  "mcpServers": {
+    "larvoice": {
+      "command": "node",
+      "args": ["/path/to/larvoice-mcp-server.js"],
+      "env": {
+        "LARVOICE_API_KEY": "your_api_key_here",
+        "LARVOICE_BASE_URL": "https://api.larvoice.com"
+      }
+    }
+  }
+}
+```
+
+Do not assume an official MCP package name unless the user provides one. For now, build wrappers directly against the HTTP API.
+
+Suggested tool inputs and outputs:
+
+### larvoice_preview_tts
+
+Input:
+
+```json
+{
+  "voice_id": "string",
+  "text": "string",
+  "language": "vi",
+  "output_format": "wav"
+}
+```
+
+Output:
+
+```json
+{
+  "audio_url": "string",
+  "content_type": "audio/wav",
+  "duration_seconds": 2.18,
+  "character_count": 34
+}
+```
+
+### larvoice_create_tts_job
+
+Input:
+
+```json
+{
+  "voice_id": "string",
+  "gen_text": "string",
+  "language": "vi",
+  "return_srt": true,
+  "output_format": "wav"
+}
+```
+
+Output:
+
+```json
+{
+  "job_id": "string",
+  "status": "queued",
+  "character_count": 34,
+  "status_url": "string"
+}
+```
+
+### larvoice_create_tts_batch
+
+Input:
+
+```json
+{
+  "voice_id": "string",
+  "language": "vi",
+  "return_srt": true,
+  "output_format": "wav",
+  "items": [
+    { "id": "intro", "gen_text": "Xin chào." }
+  ]
+}
+```
+
+Output:
+
+```json
+{
+  "batch_size": 1,
+  "total_character_count": 9,
+  "jobs": [
+    {
+      "id": "intro",
+      "job_id": "string",
+      "status": "queued",
+      "character_count": 9,
+      "status_url": "string"
+    }
+  ]
+}
+```
+
+MCP wrapper behavior:
+
+- Store the API key in environment config, not in prompts.
+- Return `audio_url`, `srt_url`, `job_id`, and `status_url` as plain strings.
+- For async jobs, do not wait forever. Poll with a reasonable timeout or return `status_url` to the caller.
+- For file uploads, accept a local file path or file bytes, then send multipart form data to `POST /v1/voices`.
+- Surface Larvoice error `code`, `message`, and `details` directly to the user.
