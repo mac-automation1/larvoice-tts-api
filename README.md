@@ -825,14 +825,24 @@ https://api.larvoice.com/llms-full.md
 
 `llms.txt` là bản index ngắn cho agent discovery. `llms-full.md` là hướng dẫn tích hợp đầy đủ, gồm flow khuyến nghị, endpoint, request mẫu, response mẫu, limits và error shape.
 
-Repo này có MCP server local để user tích hợp Larvoice vào MCP client:
+Larvoice MCP package đã publish trên npm. User có thể tích hợp Larvoice vào Cursor, Codex hoặc MCP client khác bằng `npx`, không cần cài đặt thủ công.
+
+Package:
+
+```bash
+npx -y @larvoice/mcp
+```
+
+### Cursor
+
+Thêm vào MCP config của Cursor:
 
 ```json
 {
   "mcpServers": {
     "larvoice": {
-      "command": "node",
-      "args": ["<repo>/mcp/larvoice-mcp.mjs"],
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
       "env": {
         "LARVOICE_API_KEY": "lv_your_key",
         "LARVOICE_BASE_URL": "https://api.larvoice.com"
@@ -842,10 +852,38 @@ Repo này có MCP server local để user tích hợp Larvoice vào MCP client:
 }
 ```
 
-Chạy thử local:
+### Codex
+
+Thêm vào MCP config của Codex:
+
+```toml
+[mcp_servers.larvoice]
+command = "npx"
+args = ["-y", "@larvoice/mcp"]
+
+[mcp_servers.larvoice.env]
+LARVOICE_API_KEY = "lv_your_key"
+LARVOICE_BASE_URL = "https://api.larvoice.com"
+```
+
+### MCP client khác
+
+Nếu client hỗ trợ MCP qua command, dùng:
+
+```text
+command: npx
+args: -y @larvoice/mcp
+env:
+  LARVOICE_API_KEY=lv_your_key
+  LARVOICE_BASE_URL=https://api.larvoice.com
+```
+
+`LARVOICE_BASE_URL` có thể bỏ qua nếu dùng Larvoice cloud mặc định.
+
+Chạy thử:
 
 ```bash
-LARVOICE_API_KEY=lv_your_key npm run mcp
+LARVOICE_API_KEY=lv_your_key npx -y @larvoice/mcp
 ```
 
 Nếu xây MCP server hoặc custom tool wrapper cho AI agent, nên map các tool user-facing sau:

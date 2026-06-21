@@ -455,7 +455,7 @@ Common error codes:
 
 ## MCP Integration Guide
 
-Larvoice includes a local MCP server in this repo. Use the user's API key as an environment variable in the MCP server, then call Larvoice through MCP tools.
+Larvoice provides a published MCP package for user integrations. Run it with `npx -y @larvoice/mcp`, pass the user's API key as an environment variable, then call Larvoice through MCP tools.
 
 Recommended MCP tools:
 
@@ -482,8 +482,8 @@ MCP config shape:
 {
   "mcpServers": {
     "larvoice": {
-      "command": "node",
-      "args": ["<repo>/mcp/larvoice-mcp.mjs"],
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
       "env": {
         "LARVOICE_API_KEY": "lv_your_key",
         "LARVOICE_BASE_URL": "https://api.larvoice.com"
@@ -493,10 +493,22 @@ MCP config shape:
 }
 ```
 
+Codex config shape:
+
+```toml
+[mcp_servers.larvoice]
+command = "npx"
+args = ["-y", "@larvoice/mcp"]
+
+[mcp_servers.larvoice.env]
+LARVOICE_API_KEY = "lv_your_key"
+LARVOICE_BASE_URL = "https://api.larvoice.com"
+```
+
 Local run command:
 
 ```bash
-LARVOICE_API_KEY=lv_your_key npm run mcp
+LARVOICE_API_KEY=lv_your_key npx -y @larvoice/mcp
 ```
 
 Suggested tool inputs and outputs:
