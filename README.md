@@ -26,7 +26,7 @@ Khác với LarVoice.com dành cho người dùng cuối, LarVoice API được 
 5. Nhận file audio khi hoàn thành
 
 ```text
-Text → API → Queue → TTS Engine → Audio Output
+Text → Job → Audio Output
 ```
 
 API chạy bất đồng bộ: gửi text để tạo job, poll trạng thái cho đến khi có audio.
@@ -95,6 +95,8 @@ GET    /v1/tts/jobs
 GET    /v1/tts/jobs/:job_id
 POST   /v1/voices
 GET    /v1/voices
+PATCH  /v1/voices/:id
+PUT    /v1/voices/:id
 DELETE /v1/voices/:id
 GET    /ref-audio/:file
 HEAD   /ref-audio/:file
@@ -180,8 +182,8 @@ Khi thất bại:
     "status": "failed",
     "character_count": 34,
     "error": {
-      "code": "provider_failed",
-      "message": "Voice service request failed"
+      "code": "tts_failed",
+      "message": "Không tạo được audio"
     },
     "created_at": "2026-06-20T12:00:00.000Z",
     "updated_at": "2026-06-20T12:03:00.000Z",
@@ -311,11 +313,14 @@ Response:
 POST /v1/voices
 ```
 
-Upload file audio để Larvoice cache và trả về `voice_id` cùng `ref_audio_url` dùng cho `POST /v1/tts`.
+Upload file audio để tạo voice riêng cho API key. Có thể đặt tên voice bằng field `name`.
+
+Sau khi upload, API trả về `voice_id`, `name`, `ref_text` và `ref_audio_url`. Khi tạo TTS về sau, nên dùng `voice_id` để Larvoice tự dùng đúng voice mẫu và `ref_text` đã lưu.
 
 ```bash
 curl -X POST 'https://api.larvoice.com/v1/voices' \
   -H 'x-api-key: <your-api-key>' \
+  -F 'name=Giọng nữ bán hàng' \
   -F 'file=@voice-sample.mp3'
 ```
 
@@ -325,6 +330,8 @@ Response `201 Created`:
 {
   "data": {
     "voice_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Giọng nữ bán hàng",
+    "ref_text": "Xin chào, đây là đoạn giọng mẫu của tôi.",
     "ref_audio_url": "https://api.larvoice.com/ref-audio/<sha256>.mp3",
     "file_name": "<sha256>.mp3",
     "content_type": "audio/mpeg",
@@ -336,7 +343,18 @@ Response `201 Created`:
 }
 ```
 
-Larvoice dùng tối đa `2.5` giây đầu của file audio làm reference. File tối đa `25 MB`. Định dạng hỗ trợ: `mp3`, `wav`, `m4a`, `aac`, `ogg`, `webm`.
+File tối đa `25 MB`. Định dạng hỗ trợ: `mp3`, `wav`, `m4a`, `aac`, `ogg`, `webm`.
+
+Sau khi upload, dùng `voice_id` trong `POST /v1/tts`:
+
+```json
+{
+  "gen_text": "Nội dung cần tạo giọng nói.",
+  "voice_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "language": "vi",
+  "output_format": "wav"
+}
+```
 
 ## Quản lý voice
 
@@ -359,11 +377,14 @@ Response:
     {
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "ref_audio_id": "...",
+      "name": "Giọng nữ bán hàng",
+      "ref_text": "Xin chào, đây là đoạn giọng mẫu của tôi.",
       "ref_audio_url": "https://api.larvoice.com/ref-audio/<sha256>.mp3",
       "file_name": "<sha256>.mp3",
       "content_type": "audio/mpeg",
       "size_bytes": 123456,
       "created_at": "2026-06-20T12:00:00.000Z",
+      "updated_at": "2026-06-20T12:05:00.000Z",
       "last_used_at": "2026-06-20T12:10:00.000Z",
       "use_count": 5
     }
@@ -374,6 +395,39 @@ Response:
   }
 }
 ```
+
+### Sửa tên voice và ref text
+
+```http
+PATCH /v1/voices/:id
+```
+
+User có thể sửa `name` và `ref_text` của voice đã upload. `ref_text` nên khớp với nội dung nghe được trong voice mẫu để kết quả cloning ổn định hơn.
+
+```bash
+curl -X PATCH 'https://api.larvoice.com/v1/voices/<voice_id>' \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: <your-api-key>' \
+  -d '{
+    "name": "Giọng nữ bán hàng",
+    "ref_text": "Xin chào, đây là đoạn giọng mẫu của tôi."
+  }'
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Giọng nữ bán hàng",
+    "ref_text": "Xin chào, đây là đoạn giọng mẫu của tôi.",
+    "updated_at": "2026-06-20T12:05:00.000Z"
+  }
+}
+```
+
+Có thể dùng `PUT /v1/voices/:id` với body giống `PATCH`.
 
 ### Xóa voice
 
@@ -405,7 +459,7 @@ Response:
 | --- | --- | --- |
 | `gen_text` | string | Nội dung cần tạo giọng nói. Tối đa `10000` ký tự mỗi job. Quota trừ theo số ký tự. |
 | `ref_audio_url` | string | URL giọng mẫu HTTPS. Bắt buộc nếu không có `voice_id`. |
-| `voice_id` | string | UUID voice đã upload qua `POST /v1/voices`. Bắt buộc nếu không có `ref_audio_url`. |
+| `voice_id` | string | UUID voice đã upload qua `POST /v1/voices`. Bắt buộc nếu không có `ref_audio_url`. Khi dùng `voice_id`, Larvoice tự dùng `ref_text` đã lưu của voice. |
 
 ### Field tùy chọn
 
@@ -414,6 +468,7 @@ Response:
 | `language` | string | `vi` | `vi`, `en` | Ngôn ngữ. |
 | `output_format` | string | `wav` | `wav`, `mp3` | Định dạng audio đầu ra. |
 | `return_srt` | boolean | `false` | | Trả thêm file SRT và segments. |
+| `ref_text` | string | Theo voice đã lưu | Tối đa `2000` ký tự | Nội dung tham chiếu cho voice mẫu. Thường không cần gửi nếu dùng `voice_id`. |
 | `post_speed` | number | `1.1` | `0.5`..`2` | Tốc độ hậu xử lý. |
 | `post_pitch` | number | `0` | `-6`..`6` | Chỉnh cao độ hậu xử lý. |
 | `post_volume` | number | `0.1` | `-20`..`20` | Tăng/giảm âm lượng hậu xử lý. |
