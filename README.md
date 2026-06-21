@@ -59,6 +59,7 @@ https://api.larvoice.com
 - [Chính sách dữ liệu](#chính-sách-dữ-liệu)
 - [LLM và MCP](#llm-và-mcp)
 - [Playground](#playground)
+- [Chính sách sử dụng và chống lạm dụng](#chính-sách-sử-dụng-và-chống-lạm-dụng)
 
 ## Xác thực
 
@@ -133,7 +134,14 @@ Hướng dẫn Postman:
 https://api.larvoice.com/POSTMAN.md
 ```
 
-Sau khi import, set environment variable:
+Sau khi import, tạo environment trong Postman:
+
+1. Chọn `Environments` ở sidebar trái.
+2. Bấm `+` để tạo environment mới.
+3. Đặt tên, ví dụ `Larvoice API`.
+4. Thêm variables bên dưới.
+5. Bấm `Save`.
+6. Chọn environment `Larvoice API` ở góc trên bên phải Postman trước khi chạy request.
 
 | Variable | Value |
 | --- | --- |
@@ -954,3 +962,55 @@ Giọng demo có sẵn:
 | Anh Quân | vi | `https://media.publit.io/file/larvoice/voice-custom/AnhQuan.mp3` |
 | Adam | en | `https://media.publit.io/file/larvoice/voice-custom/Adam.mp3` |
 | Vy Anh | vi | `https://media.publit.io/file/larvoice/voice-custom/VyAnh.mp3` |
+
+## Chính sách sử dụng và chống lạm dụng
+
+Larvoice được tạo ra để hỗ trợ sản xuất nội dung hợp pháp: thuyết minh, giáo dục, trợ lý AI, tổng đài hợp lệ, accessibility, demo sản phẩm và workflow sáng tạo có quyền sử dụng giọng nói.
+
+Khi dùng Larvoice API, bạn xác nhận rằng bạn có đầy đủ quyền, sự đồng ý và cơ sở pháp lý cần thiết đối với nội dung văn bản, file giọng mẫu, giọng nói được tạo ra và mục đích sử dụng đầu ra.
+
+### Hành vi bị cấm
+
+Không được dùng Larvoice để:
+
+- Giả mạo cá nhân, doanh nghiệp, cơ quan nhà nước, tổ chức tài chính, nhân viên hỗ trợ, người nổi tiếng hoặc bất kỳ bên thứ ba nào khi không có quyền rõ ràng.
+- Lừa đảo, phishing, social engineering, chiếm đoạt tài khoản, dụ chuyển tiền, dụ cung cấp mã OTP, mật khẩu, private key, thông tin ngân hàng hoặc dữ liệu cá nhân nhạy cảm.
+- Tạo cuộc gọi tự động, tin nhắn thoại, quảng cáo, robocall hoặc chiến dịch outreach trái luật, thiếu đồng ý hoặc gây hiểu nhầm.
+- Tạo bằng chứng giả, lời thú nhận giả, phát ngôn giả, nội dung vu khống, đe dọa, tống tiền, quấy rối hoặc thao túng chính trị/xã hội.
+- Clone giọng của người khác khi chưa được họ cho phép, trừ khi bạn có quyền hợp pháp rõ ràng để sử dụng giọng đó.
+- Che giấu việc nội dung là giọng AI trong trường hợp người nghe có thể bị nhầm là người thật đang nói.
+- Né quota, né giới hạn, chia sẻ API key công khai, bán lại quyền truy cập trái phép hoặc dùng nhiều tài khoản để vượt giới hạn.
+- Vi phạm luật, quyền riêng tư, quyền hình ảnh, quyền giọng nói, quyền sở hữu trí tuệ, điều khoản nền tảng hoặc nghĩa vụ hợp đồng của bạn.
+
+### Nghĩa vụ của người dùng
+
+Người dùng chịu trách nhiệm:
+
+- Chỉ upload voice mẫu khi có quyền sử dụng hoặc sự đồng ý hợp lệ.
+- Kiểm tra nội dung trước khi phát hành, đặc biệt với nội dung thương mại, quảng cáo, tài chính, y tế, pháp lý, chính trị hoặc tổng đài.
+- Gắn nhãn hoặc thông báo nội dung dùng giọng AI khi luật, nền tảng, hợp đồng hoặc ngữ cảnh yêu cầu.
+- Lưu trữ bằng chứng quyền sử dụng giọng nói, ví dụ hợp đồng, email đồng ý, giấy phép, hoặc xác nhận nội bộ.
+- Không để API key bị lộ. Mọi request phát sinh từ API key của bạn được xem là hoạt động từ tài khoản của bạn.
+
+### Quyền xử lý vi phạm
+
+Larvoice có quyền, nhưng không có nghĩa vụ, thực hiện các biện pháp sau khi phát hiện hoặc nghi ngờ lạm dụng:
+
+- Từ chối request, giới hạn tốc độ, tạm ngưng hoặc thu hồi API key.
+- Xóa voice, job, audio output hoặc dữ liệu liên quan đến hành vi vi phạm.
+- Yêu cầu xác minh quyền sử dụng voice hoặc mục đích sử dụng.
+- Chặn tài khoản, thiết bị, IP, domain, workflow hoặc integration có rủi ro cao.
+- Lưu log bảo mật cần thiết để điều tra lạm dụng, thực thi chính sách và bảo vệ hệ thống.
+- Hợp tác với nền tảng, nhà cung cấp hạ tầng, nạn nhân hoặc cơ quan có thẩm quyền khi có yêu cầu hợp lệ hoặc khi cần ngăn chặn thiệt hại.
+
+### Giới hạn trách nhiệm
+
+Larvoice cung cấp công cụ tạo giọng nói. Người dùng kiểm soát nội dung đầu vào, voice mẫu, mục đích sử dụng và việc phân phối đầu ra. Người dùng chịu trách nhiệm về mọi khiếu nại, tranh chấp, thiệt hại, xử phạt hoặc nghĩa vụ phát sinh từ việc sử dụng Larvoice trái luật, trái quyền, thiếu đồng ý hoặc vi phạm chính sách này.
+
+Larvoice không bảo đảm rằng việc sử dụng API sẽ phù hợp với mọi luật, quy định, hợp đồng hoặc chính sách nền tảng áp dụng cho từng người dùng, từng quốc gia hoặc từng ngành nghề. Nội dung này không phải tư vấn pháp lý. Nếu dùng Larvoice cho mục đích thương mại, tổng đài, quảng cáo, tài chính, y tế, pháp lý, chính trị hoặc voice cloning người thật, bạn nên tự kiểm tra nghĩa vụ pháp lý của mình hoặc hỏi luật sư.
+
+### Nguồn tham khảo
+
+- FTC: `https://www.ftc.gov/news-events/news/press-releases/2024/04/ftc-announces-impersonation-rule-goes-effect-today`
+- FTC: `https://www.ftc.gov/news-events/news/press-releases/2024/02/ftc-proposes-new-protections-combat-ai-impersonation-individuals`
+- FCC: `https://www.fcc.gov/document/fcc-makes-ai-generated-voices-robocalls-illegal`
