@@ -457,6 +457,8 @@ Common error codes:
 
 Larvoice provides a published MCP package for user integrations. Run it with `npx -y @larvoice/mcp`, pass the user's API key as an environment variable, then call Larvoice through MCP tools.
 
+Authentication for MCP is environment-based. Put the user's API key in `LARVOICE_API_KEY` in the MCP client config. There is no separate login prompt.
+
 Recommended MCP tools:
 
 | Tool | Purpose | Endpoint |

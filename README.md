@@ -833,6 +833,16 @@ Package:
 npx -y @larvoice/mcp
 ```
 
+### Auth
+
+MCP không có màn hình đăng nhập riêng. API key được điền trong phần `env` của MCP config:
+
+```text
+LARVOICE_API_KEY=lv_your_key
+```
+
+Khi chạy trong Cursor, Codex hoặc MCP client khác, client sẽ tự truyền API key này cho Larvoice MCP package.
+
 ### Cursor
 
 Thêm vào MCP config của Cursor:
