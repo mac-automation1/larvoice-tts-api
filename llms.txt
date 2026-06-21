@@ -39,7 +39,7 @@ Important limits:
 - Preview text: up to 500 characters.
 - Batch: up to 50 items.
 - Voice upload file: up to 25 MB.
-- Supported audio upload formats: mp3, wav, m4a, aac, ogg, webm.
+- Supported audio upload formats: mp3, wav, m4a.
 
 Best practice:
 - After uploading a voice, use voice_id instead of ref_audio_url.

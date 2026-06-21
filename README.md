@@ -542,6 +542,7 @@ Sau khi upload, API trả về `voice_id`, `name`, `ref_text` và `ref_audio_url
 curl -X POST 'https://api.larvoice.com/v1/voices' \
   -H 'x-api-key: <your-api-key>' \
   -F 'name=Giọng nữ bán hàng' \
+  -F 'ref_text=Xin chào, đây là đoạn giọng mẫu của tôi.' \
   -F 'file=@voice-sample.mp3'
 ```
 
@@ -564,7 +565,7 @@ Response `201 Created`:
 }
 ```
 
-File tối đa `25 MB`. Định dạng hỗ trợ: `mp3`, `wav`, `m4a`, `aac`, `ogg`, `webm`.
+File tối đa `25 MB`. Định dạng hỗ trợ: `mp3`, `wav`, `m4a`.
 
 Sau khi upload, dùng `voice_id` trong `POST /v1/tts`:
 

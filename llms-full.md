@@ -160,7 +160,7 @@ After upload, prefer `voice_id` for TTS requests.
 Limits:
 
 - File max: 25 MB.
-- Formats: mp3, wav, m4a, aac, ogg, webm.
+- Formats: mp3, wav, m4a.
 
 ## Edit Voice
 
