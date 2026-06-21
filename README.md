@@ -1,8 +1,8 @@
 # Larvoice TTS API
 
-Text-to-Speech API tiếng Việt dành cho production.
+Text-to-Speech API tiếng Việt miễn phí và trả phí dành cho production.
 
-Tạo giọng nói AI chất lượng cao từ văn bản thông qua HTTP API đơn giản. Hỗ trợ voice cloning, xử lý bất đồng bộ và khả năng mở rộng cho ứng dụng, sản phẩm SaaS, AI Agent và hệ thống tự động hóa.
+Tạo giọng nói AI chất lượng cao từ văn bản thông qua HTTP API/MCP đơn giản. Hỗ trợ voice cloning, xử lý bất đồng bộ và khả năng mở rộng cho ứng dụng, sản phẩm SaaS, AI Agent và hệ thống tự động hóa.
 
 Khác với LarVoice.com dành cho người dùng cuối, LarVoice API được xây dựng dành riêng cho lập trình viên và tích hợp hệ thống.
 
@@ -35,11 +35,18 @@ API chạy bất đồng bộ: gửi text để tạo job, poll trạng thái ch
 https://api.larvoice.com
 ```
 
+Trải nghiệm API bằng Swagger UI:
+
+```text
+https://api.larvoice.com/docs
+```
+
 ## Mục lục
 
 - [Xác thực](#xác-thực)
 - [Nhận API key miễn phí](#nhận-api-key-miễn-phí)
 - [Endpoint](#endpoint)
+- [Postman và OpenAPI](#postman-và-openapi)
 - [Quick start](#quick-start)
 - [Tạo job TTS](#tạo-job-tts)
 - [Nghe thử TTS](#nghe-thử-tts)
@@ -58,6 +65,7 @@ https://api.larvoice.com
 - [Chính sách dữ liệu](#chính-sách-dữ-liệu)
 - [LLM và MCP](#llm-và-mcp)
 - [Playground](#playground)
+- [Chính sách sử dụng và chống lạm dụng](#chính-sách-sử-dụng-và-chống-lạm-dụng)
 
 ## Xác thực
 
@@ -92,8 +100,11 @@ API key đầy đủ chỉ hiển thị khi tạo key. Hãy lưu key ở nơi an
 
 ```http
 GET    /health
+GET    /docs
 GET    /playground
 GET    /app
+GET    /openapi.json
+GET    /POSTMAN.md
 GET    /v1/me
 GET    /v1/usage
 GET    /v1/languages
@@ -116,7 +127,53 @@ GET    /files/:file?expires=...&signature=...
 HEAD   /files/:file?expires=...&signature=...
 ```
 
+## Postman và OpenAPI
+
+Swagger UI docs:
+
+```text
+https://api.larvoice.com/docs
+```
+
+Import Larvoice API vào Postman bằng OpenAPI URL:
+
+```text
+https://api.larvoice.com/openapi.json
+```
+
+Hướng dẫn Postman:
+
+```text
+https://api.larvoice.com/POSTMAN.md
+```
+
+Sau khi import, tạo environment trong Postman:
+
+1. Chọn `Environments` ở sidebar trái.
+2. Bấm `+` để tạo environment mới.
+3. Đặt tên, ví dụ `Larvoice API`.
+4. Thêm variables bên dưới.
+5. Bấm `Save`.
+6. Chọn environment `Larvoice API` ở góc trên bên phải Postman trước khi chạy request.
+
+| Variable | Value |
+| --- | --- |
+| `base_url` | `https://api.larvoice.com` |
+| `api_key` | API key Larvoice của bạn |
+
 ## Quick start
+
+Import vào Postman:
+
+```text
+https://api.larvoice.com/openapi.json
+```
+
+Hướng dẫn Postman:
+
+```text
+https://api.larvoice.com/POSTMAN.md
+```
 
 ### 1. Kiểm tra service
 
@@ -542,6 +599,7 @@ Sau khi upload, API trả về `voice_id`, `name`, `ref_text` và `ref_audio_url
 curl -X POST 'https://api.larvoice.com/v1/voices' \
   -H 'x-api-key: <your-api-key>' \
   -F 'name=Giọng nữ bán hàng' \
+  -F 'ref_text=Xin chào, đây là đoạn giọng mẫu của tôi.' \
   -F 'file=@voice-sample.mp3'
 ```
 
@@ -564,7 +622,7 @@ Response `201 Created`:
 }
 ```
 
-File tối đa `25 MB`. Định dạng hỗ trợ: `mp3`, `wav`, `m4a`, `aac`, `ogg`, `webm`.
+File tối đa `25 MB`. Định dạng hỗ trợ: `mp3`, `wav`, `m4a`.
 
 Sau khi upload, dùng `voice_id` trong `POST /v1/tts`:
 
@@ -743,7 +801,7 @@ Response:
 | `output_format` | string | `wav` | `wav`, `mp3` | Định dạng audio đầu ra. |
 | `return_srt` | boolean | `false` | | Trả thêm file SRT và segments. |
 | `ref_text` | string | Theo voice đã lưu | Tối đa `2000` ký tự | Nội dung tham chiếu cho voice mẫu. Thường không cần gửi nếu dùng `voice_id`. |
-| `post_speed` | number | `1.1` | `0.5`..`2` | Tốc độ hậu xử lý. |
+| `post_speed` | number | `1.0` | `0.5`..`2` | Tốc độ hậu xử lý. |
 | `post_pitch` | number | `0` | `-6`..`6` | Chỉnh cao độ hậu xử lý. |
 | `post_volume` | number | `0.1` | `-20`..`20` | Tăng/giảm âm lượng hậu xử lý. |
 | `speed` | number | `0.8` | `0.5`..`2` | Tốc độ tạo giọng (khác `post_speed`). |
@@ -821,18 +879,43 @@ Larvoice có tài liệu riêng cho AI agent, coding assistant và workflow auto
 ```text
 https://api.larvoice.com/llms.txt
 https://api.larvoice.com/llms-full.md
+https://api.larvoice.com/MCP.md
 ```
 
 `llms.txt` là bản index ngắn cho agent discovery. `llms-full.md` là hướng dẫn tích hợp đầy đủ, gồm flow khuyến nghị, endpoint, request mẫu, response mẫu, limits và error shape.
 
-Repo này có MCP server local để user tích hợp Larvoice vào MCP client:
+`MCP.md` là hướng dẫn riêng cho Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes và các MCP client khác.
+
+Larvoice MCP package đã publish trên npm. User có thể tích hợp bằng `npx`, không cần cài đặt thủ công.
+
+Package:
+
+```bash
+npx -y @larvoice/mcp
+```
+
+Login dễ hơn cho user không muốn tự sửa config:
+
+```bash
+npx -y @larvoice/mcp login
+```
+
+Lệnh này mở browser local để user nhập API key, kiểm tra key và lưu cục bộ trên máy user.
+
+Auth dùng biến môi trường trong MCP config:
+
+```text
+LARVOICE_API_KEY=lv_your_key
+```
+
+Config JSON phổ biến:
 
 ```json
 {
   "mcpServers": {
     "larvoice": {
-      "command": "node",
-      "args": ["<repo>/mcp/larvoice-mcp.mjs"],
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
       "env": {
         "LARVOICE_API_KEY": "lv_your_key",
         "LARVOICE_BASE_URL": "https://api.larvoice.com"
@@ -842,10 +925,18 @@ Repo này có MCP server local để user tích hợp Larvoice vào MCP client:
 }
 ```
 
-Chạy thử local:
+`LARVOICE_BASE_URL` có thể bỏ qua nếu dùng Larvoice cloud mặc định.
+
+Xem hướng dẫn MCP đầy đủ tại:
+
+```text
+https://api.larvoice.com/MCP.md
+```
+
+Chạy thử:
 
 ```bash
-LARVOICE_API_KEY=lv_your_key npm run mcp
+LARVOICE_API_KEY=lv_your_key npx -y @larvoice/mcp
 ```
 
 Nếu xây MCP server hoặc custom tool wrapper cho AI agent, nên map các tool user-facing sau:
@@ -892,3 +983,55 @@ Giọng demo có sẵn:
 | Anh Quân | vi | `https://media.publit.io/file/larvoice/voice-custom/AnhQuan.mp3` |
 | Adam | en | `https://media.publit.io/file/larvoice/voice-custom/Adam.mp3` |
 | Vy Anh | vi | `https://media.publit.io/file/larvoice/voice-custom/VyAnh.mp3` |
+
+## Chính sách sử dụng và chống lạm dụng
+
+Larvoice được tạo ra để hỗ trợ sản xuất nội dung hợp pháp: thuyết minh, giáo dục, trợ lý AI, tổng đài hợp lệ, accessibility, demo sản phẩm và workflow sáng tạo có quyền sử dụng giọng nói.
+
+Khi dùng Larvoice API, bạn xác nhận rằng bạn có đầy đủ quyền, sự đồng ý và cơ sở pháp lý cần thiết đối với nội dung văn bản, file giọng mẫu, giọng nói được tạo ra và mục đích sử dụng đầu ra.
+
+### Hành vi bị cấm
+
+Không được dùng Larvoice để:
+
+- Giả mạo cá nhân, doanh nghiệp, cơ quan nhà nước, tổ chức tài chính, nhân viên hỗ trợ, người nổi tiếng hoặc bất kỳ bên thứ ba nào khi không có quyền rõ ràng.
+- Lừa đảo, phishing, social engineering, chiếm đoạt tài khoản, dụ chuyển tiền, dụ cung cấp mã OTP, mật khẩu, private key, thông tin ngân hàng hoặc dữ liệu cá nhân nhạy cảm.
+- Tạo cuộc gọi tự động, tin nhắn thoại, quảng cáo, robocall hoặc chiến dịch outreach trái luật, thiếu đồng ý hoặc gây hiểu nhầm.
+- Tạo bằng chứng giả, lời thú nhận giả, phát ngôn giả, nội dung vu khống, đe dọa, tống tiền, quấy rối hoặc thao túng chính trị/xã hội.
+- Clone giọng của người khác khi chưa được họ cho phép, trừ khi bạn có quyền hợp pháp rõ ràng để sử dụng giọng đó.
+- Che giấu việc nội dung là giọng AI trong trường hợp người nghe có thể bị nhầm là người thật đang nói.
+- Né quota, né giới hạn, chia sẻ API key công khai, bán lại quyền truy cập trái phép hoặc dùng nhiều tài khoản để vượt giới hạn.
+- Vi phạm luật, quyền riêng tư, quyền hình ảnh, quyền giọng nói, quyền sở hữu trí tuệ, điều khoản nền tảng hoặc nghĩa vụ hợp đồng của bạn.
+
+### Nghĩa vụ của người dùng
+
+Người dùng chịu trách nhiệm:
+
+- Chỉ upload voice mẫu khi có quyền sử dụng hoặc sự đồng ý hợp lệ.
+- Kiểm tra nội dung trước khi phát hành, đặc biệt với nội dung thương mại, quảng cáo, tài chính, y tế, pháp lý, chính trị hoặc tổng đài.
+- Gắn nhãn hoặc thông báo nội dung dùng giọng AI khi luật, nền tảng, hợp đồng hoặc ngữ cảnh yêu cầu.
+- Lưu trữ bằng chứng quyền sử dụng giọng nói, ví dụ hợp đồng, email đồng ý, giấy phép, hoặc xác nhận nội bộ.
+- Không để API key bị lộ. Mọi request phát sinh từ API key của bạn được xem là hoạt động từ tài khoản của bạn.
+
+### Quyền xử lý vi phạm
+
+Larvoice có quyền, nhưng không có nghĩa vụ, thực hiện các biện pháp sau khi phát hiện hoặc nghi ngờ lạm dụng:
+
+- Từ chối request, giới hạn tốc độ, tạm ngưng hoặc thu hồi API key.
+- Xóa voice, job, audio output hoặc dữ liệu liên quan đến hành vi vi phạm.
+- Yêu cầu xác minh quyền sử dụng voice hoặc mục đích sử dụng.
+- Chặn tài khoản, thiết bị, IP, domain, workflow hoặc integration có rủi ro cao.
+- Lưu log bảo mật cần thiết để điều tra lạm dụng, thực thi chính sách và bảo vệ hệ thống.
+- Hợp tác với nền tảng, nhà cung cấp hạ tầng, nạn nhân hoặc cơ quan có thẩm quyền khi có yêu cầu hợp lệ hoặc khi cần ngăn chặn thiệt hại.
+
+### Giới hạn trách nhiệm
+
+Larvoice cung cấp công cụ tạo giọng nói. Người dùng kiểm soát nội dung đầu vào, voice mẫu, mục đích sử dụng và việc phân phối đầu ra. Người dùng chịu trách nhiệm về mọi khiếu nại, tranh chấp, thiệt hại, xử phạt hoặc nghĩa vụ phát sinh từ việc sử dụng Larvoice trái luật, trái quyền, thiếu đồng ý hoặc vi phạm chính sách này.
+
+Larvoice không bảo đảm rằng việc sử dụng API sẽ phù hợp với mọi luật, quy định, hợp đồng hoặc chính sách nền tảng áp dụng cho từng người dùng, từng quốc gia hoặc từng ngành nghề. Nội dung này không phải tư vấn pháp lý. Nếu dùng Larvoice cho mục đích thương mại, tổng đài, quảng cáo, tài chính, y tế, pháp lý, chính trị hoặc voice cloning người thật, bạn nên tự kiểm tra nghĩa vụ pháp lý của mình hoặc hỏi luật sư.
+
+### Nguồn tham khảo
+
+- FTC: `https://www.ftc.gov/news-events/news/press-releases/2024/04/ftc-announces-impersonation-rule-goes-effect-today`
+- FTC: `https://www.ftc.gov/news-events/news/press-releases/2024/02/ftc-proposes-new-protections-combat-ai-impersonation-individuals`
+- FCC: `https://www.fcc.gov/document/fcc-makes-ai-generated-voices-robocalls-illegal`

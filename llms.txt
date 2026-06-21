@@ -7,8 +7,17 @@ Base URL: https://api.larvoice.com
 Primary documentation:
 - Human docs: https://api.larvoice.com/README.md
 - LLM integration guide: https://api.larvoice.com/llms-full.md
+- MCP guide: https://api.larvoice.com/MCP.md
+- OpenAPI: https://api.larvoice.com/openapi.json
+- Postman guide: https://api.larvoice.com/POSTMAN.md
 - Playground: https://api.larvoice.com/playground
 - Mini App: https://api.larvoice.com/app
+
+MCP package:
+- Command: npx -y @larvoice/mcp
+- Login wizard: npx -y @larvoice/mcp login
+- Auth env: LARVOICE_API_KEY=<your-api-key>
+- Works with Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes, and other command-based MCP clients.
 
 Authentication:
 - Send user API key with header: x-api-key: <your-api-key>
@@ -33,7 +42,7 @@ Important limits:
 - Preview text: up to 500 characters.
 - Batch: up to 50 items.
 - Voice upload file: up to 25 MB.
-- Supported audio upload formats: mp3, wav, m4a, aac, ogg, webm.
+- Supported audio upload formats: mp3, wav, m4a.
 
 Best practice:
 - After uploading a voice, use voice_id instead of ref_audio_url.

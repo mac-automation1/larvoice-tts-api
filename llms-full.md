@@ -10,6 +10,13 @@ Base URL:
 https://api.larvoice.com
 ```
 
+OpenAPI and Postman:
+
+```text
+https://api.larvoice.com/openapi.json
+https://api.larvoice.com/POSTMAN.md
+```
+
 ## Authentication
 
 Use a user API key in every authenticated request:
@@ -160,7 +167,7 @@ After upload, prefer `voice_id` for TTS requests.
 Limits:
 
 - File max: 25 MB.
-- Formats: mp3, wav, m4a, aac, ogg, webm.
+- Formats: mp3, wav, m4a.
 
 ## Edit Voice
 
@@ -455,7 +462,19 @@ Common error codes:
 
 ## MCP Integration Guide
 
-Larvoice includes a local MCP server in this repo. Use the user's API key as an environment variable in the MCP server, then call Larvoice through MCP tools.
+Larvoice provides a published MCP package for user integrations. It works with Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes, and other MCP clients that can run command-based MCP servers. Run it with `npx -y @larvoice/mcp`, pass the user's API key as an environment variable, then call Larvoice through MCP tools.
+
+Full user-facing MCP guide: `https://api.larvoice.com/MCP.md`.
+
+Easy login command for users who do not want to edit MCP env config:
+
+```bash
+npx -y @larvoice/mcp login
+```
+
+This opens a local browser page, verifies the API key with Larvoice, and stores it locally for future MCP runs.
+
+Authentication for MCP is environment-based. Put the user's API key in `LARVOICE_API_KEY` in the MCP client config. There is no separate login prompt.
 
 Recommended MCP tools:
 
@@ -482,8 +501,8 @@ MCP config shape:
 {
   "mcpServers": {
     "larvoice": {
-      "command": "node",
-      "args": ["<repo>/mcp/larvoice-mcp.mjs"],
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
       "env": {
         "LARVOICE_API_KEY": "lv_your_key",
         "LARVOICE_BASE_URL": "https://api.larvoice.com"
@@ -493,10 +512,41 @@ MCP config shape:
 }
 ```
 
+Codex config shape:
+
+```toml
+[mcp_servers.larvoice]
+command = "npx"
+args = ["-y", "@larvoice/mcp"]
+
+[mcp_servers.larvoice.env]
+LARVOICE_API_KEY = "lv_your_key"
+LARVOICE_BASE_URL = "https://api.larvoice.com"
+```
+
+Claude Desktop config shape:
+
+```json
+{
+  "mcpServers": {
+    "larvoice": {
+      "command": "npx",
+      "args": ["-y", "@larvoice/mcp"],
+      "env": {
+        "LARVOICE_API_KEY": "lv_your_key",
+        "LARVOICE_BASE_URL": "https://api.larvoice.com"
+      }
+    }
+  }
+}
+```
+
+For Kiro, Antigravity, OpenClaw, Hermes, or other MCP clients, use the same command server values: `command = npx`, `args = -y @larvoice/mcp`, and `LARVOICE_API_KEY` in environment config.
+
 Local run command:
 
 ```bash
-LARVOICE_API_KEY=lv_your_key npm run mcp
+LARVOICE_API_KEY=lv_your_key npx -y @larvoice/mcp
 ```
 
 Suggested tool inputs and outputs:
