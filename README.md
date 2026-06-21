@@ -821,11 +821,14 @@ Larvoice có tài liệu riêng cho AI agent, coding assistant và workflow auto
 ```text
 https://api.larvoice.com/llms.txt
 https://api.larvoice.com/llms-full.md
+https://api.larvoice.com/MCP.md
 ```
 
 `llms.txt` là bản index ngắn cho agent discovery. `llms-full.md` là hướng dẫn tích hợp đầy đủ, gồm flow khuyến nghị, endpoint, request mẫu, response mẫu, limits và error shape.
 
-Larvoice MCP package đã publish trên npm. User có thể tích hợp Larvoice vào Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes hoặc MCP client khác bằng `npx`, không cần cài đặt thủ công.
+`MCP.md` là hướng dẫn riêng cho Cursor, Codex, Claude Desktop, Kiro, Antigravity, OpenClaw, Hermes và các MCP client khác.
+
+Larvoice MCP package đã publish trên npm. User có thể tích hợp bằng `npx`, không cần cài đặt thủ công.
 
 Package:
 
@@ -833,31 +836,13 @@ Package:
 npx -y @larvoice/mcp
 ```
 
-### Auth
-
-MCP không có màn hình đăng nhập riêng. API key được điền trong phần `env` của MCP config:
+Auth dùng biến môi trường trong MCP config:
 
 ```text
 LARVOICE_API_KEY=lv_your_key
 ```
 
-Khi chạy trong Cursor, Codex hoặc MCP client khác, client sẽ tự truyền API key này cho Larvoice MCP package.
-
-Client hỗ trợ:
-
-| Client | Cách cấu hình |
-| --- | --- |
-| Cursor | Dùng JSON `mcpServers`. |
-| Codex | Dùng TOML `mcp_servers`. |
-| Claude Desktop | Dùng JSON `mcpServers`. |
-| Kiro | Dùng MCP server command nếu client hỗ trợ MCP. |
-| Antigravity | Dùng MCP server command nếu client hỗ trợ MCP. |
-| OpenClaw | Dùng MCP server command nếu client hỗ trợ MCP. |
-| Hermes | Dùng MCP server command nếu client hỗ trợ MCP. |
-
-### Cursor
-
-Thêm vào MCP config của Cursor:
+Config JSON phổ biến:
 
 ```json
 {
@@ -872,54 +857,15 @@ Thêm vào MCP config của Cursor:
     }
   }
 }
-```
-
-### Codex
-
-Thêm vào MCP config của Codex:
-
-```toml
-[mcp_servers.larvoice]
-command = "npx"
-args = ["-y", "@larvoice/mcp"]
-
-[mcp_servers.larvoice.env]
-LARVOICE_API_KEY = "lv_your_key"
-LARVOICE_BASE_URL = "https://api.larvoice.com"
-```
-
-### Claude Desktop
-
-Thêm vào MCP config của Claude Desktop:
-
-```json
-{
-  "mcpServers": {
-    "larvoice": {
-      "command": "npx",
-      "args": ["-y", "@larvoice/mcp"],
-      "env": {
-        "LARVOICE_API_KEY": "lv_your_key",
-        "LARVOICE_BASE_URL": "https://api.larvoice.com"
-      }
-    }
-  }
-}
-```
-
-### Kiro, Antigravity, OpenClaw, Hermes và MCP client khác
-
-Nếu client hỗ trợ MCP qua command, dùng:
-
-```text
-command: npx
-args: -y @larvoice/mcp
-env:
-  LARVOICE_API_KEY=lv_your_key
-  LARVOICE_BASE_URL=https://api.larvoice.com
 ```
 
 `LARVOICE_BASE_URL` có thể bỏ qua nếu dùng Larvoice cloud mặc định.
+
+Xem hướng dẫn MCP đầy đủ tại:
+
+```text
+https://api.larvoice.com/MCP.md
+```
 
 Chạy thử:
 
